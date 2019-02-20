@@ -1,0 +1,22 @@
+shelfButton
+    -enableCommandRepeat 1
+    -enable 1
+    -width 39
+    -height 39
+    -manage 1
+    -visible 1
+    -preventOverride 0
+    -annotation "Launch the Twin Reaper Pipeline" 
+    -enableBackground 0
+    -align "center" 
+    -label "Twin Reaper Pipeline" 
+    -font "plainLabelFont" 
+    -overlayLabelColor 0.8 0.8 0.8 
+    -overlayLabelBackColor 0 0 0 0.5 
+    -image "TwinPipe.png" 
+    -image1 "TwinPipe.png" 
+    -style "iconOnly" 
+    -command "import TwinPipe.core; reload(TwinPipe.core); TwinPipe.core.launch()"
+    -sourceType "python"
+    -commandRepeatable 1
+;

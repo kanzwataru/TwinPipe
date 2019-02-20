@@ -1,0 +1,5 @@
+.directory
+*.pyc
+*.kate-swp
+.DS_store
+._*
