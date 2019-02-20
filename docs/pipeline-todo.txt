@@ -1,0 +1,21 @@
+Features:
+- launch git (?)
+- autoupdate
+- list all assets
+- list all shots
+- create assets/shots
+- show git status
+
+Assets: Rig Env Prop Scenes
+- create
+- delete
+- open
+- reference
+- promote to different stages
+
+Extra Features For Later Date:
+- show git log
+- switch versions
+- commit
+- pull
+- push
