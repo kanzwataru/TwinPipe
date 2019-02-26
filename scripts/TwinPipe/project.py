@@ -1,3 +1,8 @@
+import os
+import os.path
+import maya_interop as dcc
+reload(dcc)
+
 ASSET_TYPES = {
     'scene': 'Scenes',
     'env': 'Environments',
@@ -15,15 +20,35 @@ ENTITY_TYPES = {
 class Project(object):
     @staticmethod
     def load(path):
-        raise NotImplementedError
+        if not os.path.exists(path):
+            raise ValueError
+
+        # check if is maya workspace and has twinpipe metadata
+        contents = os.listdir(path)
+        if not 'workspace.mel' in contents or not 'twinpipe.json' in contents:
+            return ValueError
+
+        return Project(path)
 
     @staticmethod
     def create(path):
         raise NotImplementedError        
 
     def __init__(self, path):
-        #self.assets
-        raise NotImplementedError
+        self.path = path
+        self.assets = {}
+
+        for atype in ASSET_TYPES.keys():
+            if atype != 'scene':
+                base = os.path.join(self.path, 'assets', atype)
+            else:
+                base = os.path.join(self.path, 'scenes')
+
+            if not os.path.exists(base):
+                continue
+
+            folders = [x for x in [os.path.join(base, y) for y in os.listdir(base)] if os.path.isdir(x)]
+            self.assets[atype] = [Asset(x) for x in folders]
 
     def sync(self, asset):
         raise NotImplementedError
@@ -37,9 +62,11 @@ class Project(object):
 
 class Asset(object):
     def __init__(self, path):
-        #self.name
-        #self.entities
-        raise NotImplementedError
+        self.name = os.path.split(path)[1]
+        self.path = path
+        
+        maya_files = [os.path.join(x) for x in os.listdir(path) if x.endswith('.ma') or x.endswith('.mb')]
+        self.entities = [Entity(x) for x in maya_files]
 
     def create_entity(self, name):
         raise NotImplementedError
@@ -55,15 +82,14 @@ class Asset(object):
 
 class Entity(object):
     def __init__(self, path):
-        #self.name
-        #self.path
-        raise NotImplementedError
+        self.name = os.path.split(path)[1].split('.')[0]    # FIXME: (this could be bad if there are multiple dots)
+        self.path = path
 
     def open(self):
-        raise NotImplementedError
+        dcc.open_scene(self.path)
 
     def reference(self):
-        raise NotImplementedError
+        dcc.reference_scene(self.path)
 
     def browse(self):
         raise NotImplementedError
