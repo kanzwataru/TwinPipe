@@ -17,7 +17,7 @@ class TabContents(QtWidgets.QSplitter):
 
 
 class FrontendWindow(QtWidgets.QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, proj, parent=None):
         super(FrontendWindow, self).__init__(parent=parent)
         self.resize(800, 600)
         self.setWindowTitle("Twin Reaper Pipeline")

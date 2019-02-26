@@ -15,3 +15,10 @@ def import_scene(path):
 
 def save_scene(path):
     raise NotImplementedError
+
+
+def get_project():
+    return cmds.workspace(q=True, rd=True)
+
+def error_message(msg):
+    cmds.warning(msg)

@@ -25,8 +25,9 @@ class Project(object):
 
         # check if is maya workspace and has twinpipe metadata
         contents = os.listdir(path)
+        print contents
         if not 'workspace.mel' in contents or not 'twinpipe.json' in contents:
-            return ValueError
+            raise ValueError
 
         return Project(path)
 
