@@ -2,11 +2,12 @@ import maya.cmds as cmds
 
 
 def open_scene(path):
-    raise NotImplementedError
+    cmds.NewScene()
 
+    cmds.file(path, open=True)
 
 def reference_scene(path):
-    raise NotImplementedError
+    cmds.file(path, reference=True)
 
 
 def import_scene(path):

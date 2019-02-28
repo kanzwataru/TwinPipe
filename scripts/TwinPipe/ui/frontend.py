@@ -6,11 +6,14 @@ reload(widgets)
 
 
 class TabContents(QtWidgets.QSplitter):
-    def __init__(self):
+    def __init__(self, assets):
         super(TabContents, self).__init__()
 
-        self.addWidget(widgets.AssetWidget())
-        self.addWidget(widgets.EntityWidget())
+        entity_widget = widgets.EntityWidget()
+        asset_widget = widgets.AssetWidget(assets, entity_widget)
+
+        self.addWidget(asset_widget)
+        self.addWidget(entity_widget)
 
         self.setOrientation(QtCore.Qt.Vertical)
         self.setChildrenCollapsible(False)
@@ -19,6 +22,8 @@ class TabContents(QtWidgets.QSplitter):
 class FrontendWindow(QtWidgets.QMainWindow):
     def __init__(self, proj, parent=None):
         super(FrontendWindow, self).__init__(parent=parent)
+        self.proj = proj
+
         self.resize(800, 600)
         self.setWindowTitle("Twin Reaper Pipeline")
 
@@ -27,12 +32,20 @@ class FrontendWindow(QtWidgets.QMainWindow):
 
         #tabs.addTab(SceneTab(project.scene_repos), "scenes")
         #tabs.addTab(QtWidgets.QWidget(), "scenes")
-        tabs.addTab(TabContents(), project.ASSET_TYPES['scene'])
+
+        scene = proj.assets['scene'] if 'scene' in proj.assets else None
+        tabs.addTab(TabContents(scene), project.ASSET_TYPES['scene'])
+
         for enttype, name in project.ASSET_TYPES.iteritems():
             if enttype == 'scene':
                 continue
 
-            tabs.addTab(TabContents(), name)
+            if enttype in proj.assets:
+                assets = proj.assets[enttype]
+            else:
+                assets = None
+
+            tabs.addTab(TabContents(assets), name)
 
         #for repo in project.asset_repos:
         #    tabs.addTab(AssetTab(repo), repo.name)

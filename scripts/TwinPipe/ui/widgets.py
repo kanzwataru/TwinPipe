@@ -14,15 +14,18 @@ class TableWidget(QtWidgets.QWidget):
 
         layout = QtWidgets.QHBoxLayout()
         self.button_bar_layout = QtWidgets.QVBoxLayout()
-        button_bar_widget = QtWidgets.QWidget()
-        button_bar_widget.setLayout(self.button_bar_layout)
+        self.button_bar_widget = QtWidgets.QWidget()
+        self.button_bar_widget.setLayout(self.button_bar_layout)
 
         self.vertical_layout = QtWidgets.QVBoxLayout()
         vertical_widget = QtWidgets.QWidget()
         vertical_widget.setLayout(self.vertical_layout)
 
         self.table = QtWidgets.QTableWidget()
+        self.table.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.verticalHeader().setVisible(False)
         self.vertical_layout.addWidget(self.table)
 
         self.add_button = button('+')
@@ -32,30 +35,52 @@ class TableWidget(QtWidgets.QWidget):
         self.button_bar_layout.addStretch()
 
         layout.addWidget(vertical_widget)
-        layout.addWidget(button_bar_widget)
+        layout.addWidget(self.button_bar_widget)
         self.setLayout(layout)
 
 
 class AssetWidget(TableWidget):
-    def __init__(self, parent=None):
+    def __init__(self, assets, entity_widget, parent=None):
         super(AssetWidget, self).__init__(parent)
-
+        self.entity_widget = entity_widget
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(['Name', 'Status', 'Latest Log'])
+        self.table.itemSelectionChanged.connect(self.selection_changed)
 
+        self.reload(assets)
+
+    def reload(self, assets):
+        self.assets = assets
+        self.table.setRowCount(len(assets))
+
+        for i, asset in enumerate(assets):
+            self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(asset.name))
+
+    def selection_changed(self):
+        id = self.table.selectionModel().selectedRows()[0].row()
+        self.current_asset = self.assets[id]
+
+        self.entity_widget.reload(self.current_asset)
 
 class EntityWidget(TableWidget):
     def __init__(self, parent=None):
         super(EntityWidget, self).__init__(parent)
 
         bottom_buttons_layout = QtWidgets.QHBoxLayout()
-        bottom_buttons_widget = QtWidgets.QWidget()
-        bottom_buttons_widget.setLayout(bottom_buttons_layout)
+        self.bottom_buttons_widget = QtWidgets.QWidget()
+        self.bottom_buttons_widget.setLayout(bottom_buttons_layout)
 
         self.open_button = button('Open')
+        self.open_button.clicked.connect(lambda: self.current_entity.open())
+
         self.ref_button = button('Reference')
+        self.ref_button.clicked.connect(lambda: self.current_entity.reference())
+
         self.show_button = button('Show...')
+        self.show_button.clicked.connect(lambda: self.current_entity.browse())
+
         self.versions_button = button('Versions...')
+        self.open_button.clicked.connect(lambda: self.current_entity.open())
 
         bottom_buttons_layout.addWidget(self.open_button)
         bottom_buttons_layout.addWidget(self.ref_button)
@@ -64,5 +89,29 @@ class EntityWidget(TableWidget):
 
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(['Pipeline Step', 'Artist', 'Latest Log'])
+        self.table.itemSelectionChanged.connect(self.selection_changed)
 
-        self.vertical_layout.addWidget(bottom_buttons_widget)
+        self.vertical_layout.addWidget(self.bottom_buttons_widget)
+        self.bottom_buttons_widget.setEnabled(False)
+        self.button_bar_widget.setEnabled(False)
+
+    def reload(self, asset):
+        self.asset = asset
+
+        self.table.setRowCount(len(asset.entities))
+
+        for i, entity in enumerate(asset.entities):
+            self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(entity.name))
+
+        self.button_bar_widget.setEnabled(True)
+        self.unset_selection()
+
+    def unset_selection(self):
+        self.table.clearSelection()
+        self.bottom_buttons_widget.setEnabled(False)
+
+    def selection_changed(self):
+        id = self.table.selectionModel().selectedRows()[0].row()
+        self.current_entity = self.asset.entities[id]
+
+        self.bottom_buttons_widget.setEnabled(True)

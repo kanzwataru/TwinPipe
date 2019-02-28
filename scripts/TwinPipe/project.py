@@ -1,7 +1,9 @@
 import os
 import os.path
 import maya_interop as dcc
+import os_interop as os_inter
 reload(dcc)
+reload(os_inter)
 
 ASSET_TYPES = {
     'scene': 'Scenes',
@@ -33,7 +35,7 @@ class Project(object):
 
     @staticmethod
     def create(path):
-        raise NotImplementedError        
+        raise NotImplementedError
 
     def __init__(self, path):
         self.path = path
@@ -58,15 +60,15 @@ class Project(object):
         raise NotImplementedError
 
     def delete_asset(self, asset):
-        raise NotImplementedError        
+        raise NotImplementedError
 
 
 class Asset(object):
     def __init__(self, path):
         self.name = os.path.split(path)[1]
         self.path = path
-        
-        maya_files = [os.path.join(x) for x in os.listdir(path) if x.endswith('.ma') or x.endswith('.mb')]
+
+        maya_files = [os.path.join(path, x) for x in os.listdir(path) if x.endswith('.ma') or x.endswith('.mb')]
         self.entities = [Entity(x) for x in maya_files]
 
     def create_entity(self, name):
@@ -83,7 +85,7 @@ class Asset(object):
 
 class Entity(object):
     def __init__(self, path):
-        self.name = os.path.split(path)[1].split('.')[0]    # FIXME: (this could be bad if there are multiple dots)
+        self.name = os.path.split(path)[1].split('.')[0].split('_')[2]    # FIXME: (this could be bad if there are multiple dots)
         self.path = path
 
     def open(self):
@@ -93,7 +95,7 @@ class Entity(object):
         dcc.reference_scene(self.path)
 
     def browse(self):
-        raise NotImplementedError
+        os_inter.show_path(self.path)
 
     def get_log(self):
         raise NotImplementedError
