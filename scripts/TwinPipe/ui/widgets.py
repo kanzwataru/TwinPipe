@@ -1,5 +1,6 @@
 from TwinPipe.vendor.Qt import QtCore, QtGui, QtCompat, QtWidgets
-
+import dialogs
+reload(dialogs)
 
 def button(label):
     btn = QtWidgets.QPushButton(label)
@@ -40,20 +41,24 @@ class TableWidget(QtWidgets.QWidget):
 
 
 class AssetWidget(TableWidget):
-    def __init__(self, assets, entity_widget, parent=None):
+    def __init__(self, proj, assets, entity_widget, parent=None):
         super(AssetWidget, self).__init__(parent)
         self.entity_widget = entity_widget
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(['Name', 'Status', 'Latest Log'])
         self.table.itemSelectionChanged.connect(self.selection_changed)
 
-        self.reload(assets)
-
-    def reload(self, assets):
+        self.proj = proj
         self.assets = assets
-        self.table.setRowCount(len(assets))
 
-        for i, asset in enumerate(assets):
+        self.add_button.clicked.connect(self.new_asset)
+
+        self.reload()
+
+    def reload(self):
+        self.table.setRowCount(len(self.assets))
+
+        for i, asset in enumerate(self.assets):
             self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(asset.name))
 
     def selection_changed(self):
@@ -61,6 +66,15 @@ class AssetWidget(TableWidget):
         self.current_asset = self.assets[id]
 
         self.entity_widget.reload(self.current_asset)
+
+    def new_asset(self):
+        def new_asset_callback(name):
+            self.proj.create_asset(name)
+            self.reload()
+            self.entity_widget.unload()
+
+        dialog = dialogs.NewAssetDialog(new_asset_callback)
+        dialog.exec_()
 
 class EntityWidget(TableWidget):
     def __init__(self, parent=None):
@@ -92,6 +106,11 @@ class EntityWidget(TableWidget):
         self.table.itemSelectionChanged.connect(self.selection_changed)
 
         self.vertical_layout.addWidget(self.bottom_buttons_widget)
+        self.unload()
+
+    def unload(self):
+        self.table.setRowCount(0)
+
         self.bottom_buttons_widget.setEnabled(False)
         self.button_bar_widget.setEnabled(False)
 

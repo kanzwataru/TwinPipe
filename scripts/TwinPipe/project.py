@@ -51,12 +51,12 @@ class Project(object):
                 continue
 
             folders = [x for x in [os.path.join(base, y) for y in os.listdir(base)] if os.path.isdir(x)]
-            self.assets[atype] = [Asset(x) for x in folders]
+            self.assets[atype] = [Asset(x, atype) for x in folders]
 
     def sync(self, asset):
         raise NotImplementedError
 
-    def create_asset(self, asset):
+    def create_asset(self, name):
         raise NotImplementedError
 
     def delete_asset(self, asset):
@@ -64,9 +64,10 @@ class Project(object):
 
 
 class Asset(object):
-    def __init__(self, path):
+    def __init__(self, path, atype):
         self.name = os.path.split(path)[1]
         self.path = path
+        self.atype = atype
 
         maya_files = [os.path.join(path, x) for x in os.listdir(path) if x.endswith('.ma') or x.endswith('.mb')]
         self.entities = [Entity(x) for x in maya_files]

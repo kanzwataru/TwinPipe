@@ -6,11 +6,11 @@ reload(widgets)
 
 
 class TabContents(QtWidgets.QSplitter):
-    def __init__(self, assets):
+    def __init__(self, proj, assets):
         super(TabContents, self).__init__()
 
         entity_widget = widgets.EntityWidget()
-        asset_widget = widgets.AssetWidget(assets, entity_widget)
+        asset_widget = widgets.AssetWidget(proj, assets, entity_widget)
 
         self.addWidget(asset_widget)
         self.addWidget(entity_widget)
@@ -34,18 +34,18 @@ class FrontendWindow(QtWidgets.QMainWindow):
         #tabs.addTab(QtWidgets.QWidget(), "scenes")
 
         scene = proj.assets['scene'] if 'scene' in proj.assets else None
-        tabs.addTab(TabContents(scene), project.ASSET_TYPES['scene'])
+        tabs.addTab(TabContents(proj, scene), project.ASSET_TYPES['scene'])
 
-        for enttype, name in project.ASSET_TYPES.iteritems():
-            if enttype == 'scene':
+        for atype, name in project.ASSET_TYPES.iteritems():
+            if atype == 'scene':
                 continue
 
-            if enttype in proj.assets:
-                assets = proj.assets[enttype]
+            if atype in proj.assets:
+                assets = proj.assets[atype]
             else:
                 assets = None
 
-            tabs.addTab(TabContents(assets), name)
+            tabs.addTab(TabContents(proj, assets), name)
 
         #for repo in project.asset_repos:
         #    tabs.addTab(AssetTab(repo), repo.name)
