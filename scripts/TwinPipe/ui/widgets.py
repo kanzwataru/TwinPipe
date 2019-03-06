@@ -1,4 +1,5 @@
 from TwinPipe.vendor.Qt import QtCore, QtGui, QtCompat, QtWidgets
+import TwinPipe.maya_interop as dcc
 import dialogs
 reload(dialogs)
 
@@ -41,7 +42,7 @@ class TableWidget(QtWidgets.QWidget):
 
 
 class AssetWidget(TableWidget):
-    def __init__(self, proj, assets, entity_widget, parent=None):
+    def __init__(self, proj, atype, entity_widget, parent=None):
         super(AssetWidget, self).__init__(parent)
         self.entity_widget = entity_widget
         self.table.setColumnCount(3)
@@ -49,14 +50,20 @@ class AssetWidget(TableWidget):
         self.table.itemSelectionChanged.connect(self.selection_changed)
 
         self.proj = proj
-        self.assets = assets
+        self.atype = atype
 
         self.add_button.clicked.connect(self.new_asset)
+        self.remove_button.clicked.connect(self.delete_asset)
 
         self.reload()
 
     def reload(self):
+        self.current_asset = None
+        self.assets = self.proj.assets[self.atype]
+        
         self.table.setRowCount(len(self.assets))
+        self.table.clearSelection()
+        self.entity_widget.unload()
 
         for i, asset in enumerate(self.assets):
             self.table.setItem(i, 0, QtWidgets.QTableWidgetItem(asset.name))
@@ -69,12 +76,20 @@ class AssetWidget(TableWidget):
 
     def new_asset(self):
         def new_asset_callback(name):
-            self.proj.create_asset(name)
+            self.proj.create_asset(self.atype, name)
             self.reload()
-            self.entity_widget.unload()
 
         dialog = dialogs.NewAssetDialog(new_asset_callback)
         dialog.exec_()
+
+    def delete_asset(self):
+        if not self.current_asset:
+            return
+
+        if dcc.confirm_ask('Delete', 'Delete asset "{}"?'.format(self.current_asset.name)):
+            self.proj.delete_asset(self.current_asset)
+
+        self.reload()
 
 class EntityWidget(TableWidget):
     def __init__(self, parent=None):

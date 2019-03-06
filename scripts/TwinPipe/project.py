@@ -1,5 +1,6 @@
 import os
 import os.path
+import shutil
 import maya_interop as dcc
 import os_interop as os_inter
 reload(dcc)
@@ -18,6 +19,22 @@ ENTITY_TYPES = {
     'prop': ['rough', 'model', 'rig'],
     'char': ['rough', 'model', 'rig']
 }
+
+
+def get_template_scene(path):
+    # get back to the project root
+    while not 'twinpipe.json' in os.listdir(path):
+        old = path
+        path = os.path.split(path)[0]
+        assert(old != path)
+
+    # return template scene
+    template = os.path.join(path, 'new_file_template.ma')
+    if not os.path.exists(template):
+        dcc.new_file()
+        dcc.save_scene(template)
+
+    return template
 
 class Project(object):
     @staticmethod
@@ -42,13 +59,10 @@ class Project(object):
         self.assets = {}
 
         for atype in ASSET_TYPES.keys():
-            if atype != 'scene':
-                base = os.path.join(self.path, 'assets', atype)
-            else:
-                base = os.path.join(self.path, 'scenes')
+            base = self._path_for_atype(atype)
 
             if not os.path.exists(base):
-                continue
+                os.makedirs(base)
 
             folders = [x for x in [os.path.join(base, y) for y in os.listdir(base)] if os.path.isdir(x)]
             self.assets[atype] = [Asset(x, atype) for x in folders]
@@ -56,12 +70,31 @@ class Project(object):
     def sync(self, asset):
         raise NotImplementedError
 
-    def create_asset(self, name):
-        raise NotImplementedError
+    def create_asset(self, atype, name):
+        path = os.path.join(self._path_for_atype(atype), name)
+        if os.path.exists(path):
+            dcc.error_message("This asset already exists")
+            return
+
+        os.makedirs(path)
+
+        self.assets[atype].append(Asset(path, atype))
 
     def delete_asset(self, asset):
-        raise NotImplementedError
+        contents = os.listdir(asset.path)
+        if contents:
+            assert(0 != len([x for x in contents if x.endswith('.ma') or x.endswith('.mb')]))
 
+        shutil.rmtree(asset.path)
+        self.assets[asset.atype].remove(asset)
+
+    def _path_for_atype(self, atype):
+        if atype != 'scene':
+            base = os.path.join(self.path, 'assets', atype)
+        else:
+            base = os.path.join(self.path, 'scenes')
+
+        return base
 
 class Asset(object):
     def __init__(self, path, atype):

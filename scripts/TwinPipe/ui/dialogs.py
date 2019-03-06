@@ -4,7 +4,8 @@ import TwinPipe.maya_interop as dcc
 def is_valid_name(name):
     import string
 
-    valid_set = string.ascii_letters + '-'
+    valid_set = string.ascii_letters + string.digits + '-'
+    print valid_set
     for char in name:
         if char not in valid_set:
             return False
@@ -22,6 +23,7 @@ class NewAssetDialog(QtWidgets.QDialog):
         button_layout_widget = QtWidgets.QWidget()
         button_layout_widget.setLayout(button_layout)
 
+        self.setWindowTitle("Asset Creation")
         self.label = QtWidgets.QLabel("Create a new asset named: ")
         self.name = QtWidgets.QLineEdit()
         self.name.returnPressed.connect(self.confirm_input)
@@ -41,9 +43,11 @@ class NewAssetDialog(QtWidgets.QDialog):
         self.setLayout(layout)
 
     def confirm_input(self):
-        text = self.label.text()
+        text = self.name.text()
 
         if not is_valid_name(text):
             dcc.error_message('Invalid name, you cannot have spaces or special characters other than "-"')
+            return
 
         self.callback(text)
+        self.close()
