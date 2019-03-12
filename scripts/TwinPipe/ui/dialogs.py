@@ -12,6 +12,7 @@ def is_valid_name(name):
 
     return True
 
+
 class NewAssetDialog(QtWidgets.QDialog):
     def __init__(self, callback, parent=None):
         super(NewAssetDialog, self).__init__(parent)
@@ -51,3 +52,42 @@ class NewAssetDialog(QtWidgets.QDialog):
 
         self.callback(text)
         self.close()
+
+
+class NewEntityDialog(QtWidgets.QDialog):
+	def __init__(self, choices, callback, parent=None):
+		super(NewEntityDialog, self).__init__(parent)
+		
+        layout = QtWidgets.QVBoxLayout()
+        combo_layout = QtWidgets.QHBoxLayout()
+        combo_layout_widget = QtWidgets.QWidget()
+        combo_layout_widget.setLayout(combo_layout)
+        button_layout = QtWidgets.QHBoxLayout()
+        button_layout_widget = QtWidgets.QWidget()
+        button_layout_widget.setLayout(button_layout)
+		
+		self.setWindowTitle("Maya File Creation")
+		self.label = QtWidgets.QLabel("Create a new Maya file")
+		self.combo_label = QtWidgets.QLabel("Pipeline stage: ")
+		self.stage = QtWidgets.QComboBox()
+		
+		for choice in choices:
+			self.stage.addItem(choice)
+		self.stage.addItem("Custom...")
+		self.stage.setCurrentIndex(0)
+
+		self.custom = QtWidgets.QLineEdit()
+		
+		self.ok = QtWidgets.QPushButton('Create')
+        self.ok.clicked.connect(self.confirm_input)
+
+        self.cancel = QtWidgets.QPushButton('Cancel')
+        self.cancel.clicked.connect(self.reject)
+		
+		combo_layout.addWidget(self.combo_label, self.stage)
+        button_layout.addWidget(self.ok)
+        button_layout.addWidget(self.cancel)
+        layout.addWidget(button_layout_widget)
+		layout.addWidget(combo_layout_widget)
+
+		self.setLayout(layout)

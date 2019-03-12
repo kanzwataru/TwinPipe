@@ -1,3 +1,4 @@
+from TwinPipe import project
 from TwinPipe.vendor.Qt import QtCore, QtGui, QtCompat, QtWidgets
 import TwinPipe.maya_interop as dcc
 import dialogs
@@ -149,3 +150,15 @@ class EntityWidget(TableWidget):
         self.current_entity = self.asset.entities[id]
 
         self.bottom_buttons_widget.setEnabled(True)
+
+    def new_entity(self):
+        all_types = project.ENTITY_TYPES[self.asset.atype]
+		types = filter(lambda x: not [x in y.name for y in self.asset.entities], all_types)
+		
+		def new_entity_callback(name):
+            #self.proj.create_asset(self.atype, name)
+			print name
+            self.reload()
+
+        dialog = dialogs.NewEntityDialog(types, new_entity_callback)
+        dialog.exec_()
