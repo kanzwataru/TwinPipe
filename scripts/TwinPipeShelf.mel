@@ -6,6 +6,29 @@ shelfButton
     -manage 1
     -visible 1
     -preventOverride 0
+    -annotation "Set up the TwinReaper Pipeline" 
+    -enableBackground 0
+    -align "center" 
+    -label "Twin Reaper Setup" 
+    -font "plainLabelFont" 
+    -overlayLabelColor 0.8 0.8 0.8 
+    -overlayLabelBackColor 0 0 0 0.5 
+    -image "TwinSetup.png" 
+    -image1 "TwinSetup.png" 
+    -style "iconOnly" 
+    -command "import TwinPipe.setup.env_setup; reload(TwinPipe.setup.env_setup); TwinPipe.setup.env_setup.setup_window()"
+    -sourceType "python"
+    -commandRepeatable 1
+;
+
+shelfButton
+    -enableCommandRepeat 1
+    -enable 1
+    -width 39
+    -height 39
+    -manage 1
+    -visible 1
+    -preventOverride 0
     -annotation "Launch the Twin Reaper Pipeline" 
     -enableBackground 0
     -align "center" 
