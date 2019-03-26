@@ -10,15 +10,24 @@ shelfButton
     -enableBackground 0
     -align "center" 
     -label "Twin Reaper Setup" 
+    -labelOffset 0
+    -rotation 0
+    -flipX 0
+    -flipY 0
+    -useAlpha 1
     -font "plainLabelFont" 
+    -imageOverlayLabel "setup" 
     -overlayLabelColor 0.8 0.8 0.8 
     -overlayLabelBackColor 0 0 0 0.5 
-    -image "TwinSetup.png" 
-    -image1 "TwinSetup.png" 
+    -image "nodeEditorHypershadePerspLayout.png" 
+    -image1 "nodeEditorHypershadePerspLayout.png" 
     -style "iconOnly" 
-    -command "import TwinPipe.setup.env_setup; reload(TwinPipe.setup.env_setup); TwinPipe.setup.env_setup.setup_window()"
-    -sourceType "python"
+    -marginWidth 1
+    -marginHeight 1
+    -command "import TwinPipe.setup.env_setup; reload(TwinPipe.setup.env_setup); TwinPipe.setup.env_setup.setup_window()" 
+    -sourceType "python" 
     -commandRepeatable 1
+    -flat 1
 ;
 
 shelfButton
@@ -33,13 +42,22 @@ shelfButton
     -enableBackground 0
     -align "center" 
     -label "Twin Reaper Pipeline" 
+    -labelOffset 0
+    -rotation 0
+    -flipX 0
+    -flipY 0
+    -useAlpha 1
     -font "plainLabelFont" 
+    -imageOverlayLabel "pipe" 
     -overlayLabelColor 0.8 0.8 0.8 
     -overlayLabelBackColor 0 0 0 0.5 
-    -image "TwinPipe.png" 
-    -image1 "TwinPipe.png" 
+    -image "textureEditor.png" 
+    -image1 "textureEditor.png" 
     -style "iconOnly" 
-    -command "import TwinPipe.core; reload(TwinPipe.core); TwinPipe.core.launch()"
-    -sourceType "python"
+    -marginWidth 1
+    -marginHeight 1
+    -command "import TwinPipe.core; reload(TwinPipe.core); TwinPipe.core.launch()" 
+    -sourceType "python" 
     -commandRepeatable 1
+    -flat 1
 ;
