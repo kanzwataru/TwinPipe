@@ -112,6 +112,9 @@ class EntityWidget(TableWidget):
         self.versions_button = button('Versions...')
         self.open_button.clicked.connect(lambda: self.current_entity.open())
 
+        self.add_button.clicked.connect(self.new_entity)
+        self.remove_button.clicked.connect(self.delete_entity)
+
         bottom_buttons_layout.addWidget(self.open_button)
         bottom_buttons_layout.addWidget(self.ref_button)
         bottom_buttons_layout.addWidget(self.versions_button)
@@ -125,6 +128,7 @@ class EntityWidget(TableWidget):
         self.unload()
 
     def unload(self):
+        self.current_entity = None
         self.table.setRowCount(0)
 
         self.bottom_buttons_widget.setEnabled(False)
@@ -142,6 +146,7 @@ class EntityWidget(TableWidget):
         self.unset_selection()
 
     def unset_selection(self):
+        self.current_entity = None
         self.table.clearSelection()
         self.bottom_buttons_widget.setEnabled(False)
 
@@ -153,12 +158,20 @@ class EntityWidget(TableWidget):
 
     def new_entity(self):
         all_types = project.ENTITY_TYPES[self.asset.atype]
-        types = filter(lambda x: not [x in y.name for y in self.asset.entities], all_types)
+        types = filter(lambda x: not [x for y in self.asset.entities if x in y.name], all_types)
         
         def new_entity_callback(name):
-            #self.proj.create_asset(self.atype, name)
-            print name
-            self.reload()
+            self.asset.create_entity(name)
+            self.reload(self.asset)
 
         dialog = dialogs.NewEntityDialog(types, new_entity_callback)
         dialog.exec_()
+
+    def delete_entity(self):
+        if not self.current_entity:
+            return
+
+        if dcc.confirm_ask('Delete', 'Delete entity "{}"?'.format(self.current_entity.path)):
+            self.asset.delete_entity(self.current_entity)
+
+        self.reload(self.asset)

@@ -31,8 +31,9 @@ def get_template_scene(path):
     # return template scene
     template = os.path.join(path, 'new_file_template.ma')
     if not os.path.exists(template):
-        dcc.new_file()
+        dcc.new_scene()
         dcc.save_scene(template)
+        dcc.new_scene()
 
     return template
 
@@ -106,10 +107,11 @@ class Asset(object):
         self.entities = [Entity(x) for x in maya_files]
 
     def create_entity(self, name):
-        raise NotImplementedError
+        self.entities.append(Entity.create(self.name, self.atype, name, self.path))
 
     def delete_entity(self, entity):
-        raise NotImplementedError
+        os.remove(entity.path)
+        self.entities.remove(entity)
 
     def promote(self, from_entity, to_entity):
         raise NotImplementedError
@@ -118,6 +120,14 @@ class Asset(object):
         raise NotImplementedError
 
 class Entity(object):
+    @staticmethod
+    def create(name, atype, entity_name, path):
+        file_name = '_'.join([name, atype, entity_name]) + '.ma'
+        file_path = os.path.join(path, file_name)
+        shutil.copy(get_template_scene(path), file_path)
+
+        return Entity(file_path)
+
     def __init__(self, path):
         self.name = os.path.split(path)[1].split('.')[0].split('_')[2]    # FIXME: (this could be bad if there are multiple dots)
         self.path = path
