@@ -153,11 +153,11 @@ class EntityWidget(TableWidget):
 
     def new_entity(self):
         all_types = project.ENTITY_TYPES[self.asset.atype]
-		types = filter(lambda x: not [x in y.name for y in self.asset.entities], all_types)
-		
-		def new_entity_callback(name):
+        types = filter(lambda x: not [x in y.name for y in self.asset.entities], all_types)
+        
+        def new_entity_callback(name):
             #self.proj.create_asset(self.atype, name)
-			print name
+            print name
             self.reload()
 
         dialog = dialogs.NewEntityDialog(types, new_entity_callback)
