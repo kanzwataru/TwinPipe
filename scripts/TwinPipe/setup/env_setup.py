@@ -1,4 +1,5 @@
 import maya.cmds as cmds
+import maya.mel as mel
 import pymel.core as pm
 import os.path
 import subprocess
@@ -14,6 +15,7 @@ MBOXX_USER = "wataru"
 MBOXX_PASS = "qwaszx"
 
 REPO_PATH = os.path.join(MBOXX_MAPPED_LETTER, '__repository__', 'TwinReaperRepo.git')
+PROJECT_NAME = 'TwinReaper'
 
 def bin_dir():
     path = cmds.getModulePath(mn='TwinPipeBootstrap')
@@ -38,12 +40,17 @@ def git_setup():
 def clone_project():
     mboxx_setup()
     
-    path = cmds.fileDialog2(dialogStyle=2, fileMode=3, okCaption='Clone Here')[0]
-    if os.listdir(path):
-        cmds.warning("Please choose an empty folder to copy into")
+    path = cmds.fileDialog2(dialogStyle=2, fileMode=3, okCaption='Clone Here')
+    if not path:
         return
+
+    path = path[0]
+    clone_path = os.path.normpath(os.path.join(path, PROJECT_NAME))
     
-    subprocess.call("start cmd /k git clone {} {}".format(REPO_PATH, path), shell=True)
+    subprocess.call("start cmd /k git clone {} {}".format(REPO_PATH, clone_path), shell=True)
+
+def set_project():
+    mel.eval('SetProject')
 
 def setup_window():
     win_name = "twinPipeSetupUI"
@@ -54,11 +61,16 @@ def setup_window():
         with pm.verticalLayout():
             pm.button(
                 label="Install Git Tools...",
-                bgc=(0.5, 0.55, 0.45),
+                bgc=(0.5, 0.6, 0.4),
                 c=lambda _: git_setup()
             )
             pm.button(
-                label="Clone project from mboxx",
+                label="Clone Project from MBOXX",
                 bgc=(0.5, 0.6, 0.65),
                 c=lambda _: clone_project()
+            )
+            pm.button(
+                label="Set Project",
+                bgc=(0.4, 0.55, 0.45),
+                c=lambda _: set_project()
             )
