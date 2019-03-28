@@ -9,10 +9,10 @@ net use m: /delete
 net use m: \\macbook-w7\share\sub qwaszx /user:wataru /persistent:yes
 """
 
-MBOXX_SHARE_PATH = "\\\\macbook-w7\\share\\sub"
+MBOXX_SHARE_PATH = "\\\\mboxx\\3rd_year_films\\TwinReaper"
 MBOXX_MAPPED_LETTER = "m:"
-MBOXX_USER = "wataru"
-MBOXX_PASS = "qwaszx"
+MBOXX_USER = "3duser"
+MBOXX_PASS = "d4ws0n"
 
 REPO_PATH = os.path.join(MBOXX_MAPPED_LETTER, '__repository__', 'TwinReaperRepo.git')
 PROJECT_NAME = 'TwinReaper'
@@ -57,7 +57,7 @@ def setup_window():
     if pm.window(win_name, exists=True):
         pm.deleteUI(win_name)
 
-    with pm.window(win_name, title="TwinPipe Setup"):
+    with pm.window(win_name, title="TwinPipe Setup", height=400):
         with pm.verticalLayout():
             pm.button(
                 label="Install Git Tools...",
@@ -73,4 +73,9 @@ def setup_window():
                 label="Set Project",
                 bgc=(0.4, 0.55, 0.45),
                 c=lambda _: set_project()
+            )
+            pm.separator()
+            pm.button(
+                label="Map MBOXX to M:\\ drive",
+                c=lambda _: mboxx_setup()
             )
