@@ -21,6 +21,11 @@ def bin_dir():
     path = cmds.getModulePath(mn='TwinPipeBootstrap')
     return os.path.normpath(os.path.join(path, 'bin'))
 
+def git():
+    path = bin_dir()
+    git_path = os.path.normpath(os.path.join(path, 'git','bin','git.exe'))
+    return git_path
+
 def mboxx_setup():
     try:
         subprocess.call("net use {} /delete".format(MBOXX_MAPPED_LETTER))
@@ -47,7 +52,7 @@ def clone_project():
     path = path[0]
     clone_path = os.path.normpath(os.path.join(path, PROJECT_NAME))
     
-    subprocess.call("start cmd /k git clone {} {}".format(REPO_PATH, clone_path), shell=True)
+    subprocess.call("start cmd /k {} clone {} {}".format(git(), REPO_PATH, clone_path), shell=True)
 
 def set_project():
     mel.eval('SetProject')
